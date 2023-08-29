@@ -1,18 +1,20 @@
 package com.mjpancheri.financialcontrol.infrastructure.external.impl;
 
 import com.mjpancheri.financialcontrol.infrastructure.external.EmailService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class FakeEmailService implements EmailService {
     @Override
     public void send(String to, String subject, String message) {
-        String log = """
+        log.info("""
+                        
                         ============== Send Email - start ===============
-                        TO: %s
-                        SUBJECT: %s
-                        MESSAGE: %s
-                        ============== Send Email - end   ===============""".formatted(to, subject, message);
-        System.out.println(log);
+                        TO: {}
+                        SUBJECT: {}
+                        MESSAGE: {}
+                        ============== Send Email - end   ===============""", to, subject, message);
     }
 }

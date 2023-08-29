@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <springProperty scope="context" name="springAppName" source="api.name"/>
+    <springProperty scope="context" name="logLevel" source="logging.pattern.level"/>
+
+    <property name="LOG_PATTERN1" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %p %m%n" />
+    <property name="LOG_PATTERN2" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS} [%thread] ${logLevel} %logger{36} - %msg%n" />
+    <property name="LOG_PATTERN3"
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint}
+              %clr([${springAppName}])
+              %clr([traceId = %X{traceId:-without_a_trace}])
+              %clr([spanId = %X{spanId:-without_a_span}])
+              %clr(${LOG_LEVEL_PATTERN:-%5p})
+              %clr(${PID:- }){magenta}
+              %clr(---){faint}
+              %clr([%15.15t]){faint}
+              %clr(%-40.40logger{39}){cyan}
+              %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+
+    <springProfile name="local,default">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${LOG_PATTERN2}</pattern>
+                <charset>utf8</charset>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="dev">
+        <appender name="jsonConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <fieldNames>
+                    <version>[ignore]</version>
+                </fieldNames>
+            </encoder>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="jsonConsoleAppender"/>
+        </root>
+    </springProfile>
+
+</configuration>
