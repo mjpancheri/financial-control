@@ -1,8 +1,7 @@
 package com.mjpancheri.financialcontrol.application.exception;
 
-import lombok.AllArgsConstructor;
-import org.springframework.context.MessageSource;
-import org.springframework.context.NoSuchMessageException;
+import com.mjpancheri.financialcontrol.application.service.I18nService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,29 +9,29 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Locale;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RestControllerAdvice
 public class FinancialControlExceptionHandler {
 
-    private MessageSource messageSource;
+    private final I18nService i18nService;
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<FinancialControlExceptionResponse> handleUnauthorizedException(ResourceNotFoundException exception) {
+    @ExceptionHandler(FinancialControlException.class)
+    public ResponseEntity<FinancialControlExceptionResponse> handleFinancialControlException(FinancialControlException exception) {
         FinancialControlExceptionResponse res = new FinancialControlExceptionResponse(
-                renderMessage("error.not.found.message", "teste"),
-                null);
+                i18nService.renderMessage(exception.getCode(), exception.getArgs()),
+                null, LocalDateTime.now());
 
-        return new ResponseEntity<>(res, new HttpHeaders(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(res, new HttpHeaders(), exception.getStatus());
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<FinancialControlExceptionResponse> handleUnauthorizedException(UnauthorizedException exception) {
         FinancialControlExceptionResponse res = new FinancialControlExceptionResponse(
-                renderMessage("error.unauthorized.message"),
-                null);
+                i18nService.renderMessage(exception.getCode(), exception.getArgs()),
+                null, LocalDateTime.now());
 
         return new ResponseEntity<>(res, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
@@ -48,21 +47,11 @@ public class FinancialControlExceptionHandler {
                     nestedErrors.add(nestedError);
                 });
         FinancialControlExceptionResponse res = new FinancialControlExceptionResponse(
-                renderMessage("error.validation.message", exception.getObjectName()),
-                nestedErrors);
+                i18nService.renderMessage("error.validation.message", exception.getObjectName()),
+                nestedErrors, LocalDateTime.now());
 
         return new ResponseEntity<>(res, new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    private String renderMessage(String code) throws NoSuchMessageException {
-        return renderMessage(code, null);
-    }
 
-    private String renderMessage(String code, Object... args) throws NoSuchMessageException {
-        try {
-            return messageSource.getMessage(code, args, Locale.getDefault());
-        } catch (NoSuchMessageException exception) {
-            return code;
-        }
-    }
 }

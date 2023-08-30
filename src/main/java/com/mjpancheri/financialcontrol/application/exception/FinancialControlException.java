@@ -7,13 +7,13 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public class FinancialControlException extends RuntimeException {
-    private final String message;
-    private final String[] args;
+    private final String code;
+    private final transient Object[] args;
     private final HttpStatus status;
 
-    public FinancialControlException(String message) {
-        this.message = message;
-        this.args = new String[0];
+    public FinancialControlException(String code) {
+        this.code = code;
+        this.args = new Object[0];
         this.status = HttpStatus.BAD_REQUEST;
     }
 }
