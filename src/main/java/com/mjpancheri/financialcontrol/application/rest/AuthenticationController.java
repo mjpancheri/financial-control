@@ -1,5 +1,7 @@
 package com.mjpancheri.financialcontrol.application.rest;
 
+import com.mjpancheri.financialcontrol.application.service.AuthorizationService;
+import com.mjpancheri.financialcontrol.application.service.UserService;
 import com.mjpancheri.financialcontrol.domain.user.User;
 import com.mjpancheri.financialcontrol.domain.user.UserRole;
 import com.mjpancheri.financialcontrol.domain.user.dto.*;
@@ -14,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.AuthenticationException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -24,6 +27,7 @@ public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final TokenService tokenService;
     private final EmailService emailService;
 
@@ -51,14 +55,10 @@ public class AuthenticationController {
     }
 
     @GetMapping("me")
-    public ResponseEntity<UserResponseDTO> me(@RequestHeader(name = "Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        String email = tokenService.validateToken(token);
+    public ResponseEntity<UserResponseDTO> me(@RequestHeader(name = "Authorization") String authHeader)
+            throws AuthenticationException {
+        User user = userService.getUserByAuthorizationToken(authHeader);
 
-        if (email.isEmpty()) {
-            return ResponseEntity.status(401).build();
-        }
-        User user = (User) userRepository.findByEmail(email);
         return ResponseEntity.ok().body(user.convertTo());
     }
 

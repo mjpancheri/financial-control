@@ -1,5 +1,6 @@
 package com.mjpancheri.financialcontrol.application.rest;
 
+import com.mjpancheri.financialcontrol.application.service.UserService;
 import com.mjpancheri.financialcontrol.domain.user.User;
 import com.mjpancheri.financialcontrol.domain.user.dto.UpdateUserDTO;
 import com.mjpancheri.financialcontrol.domain.user.dto.UserResponseDTO;
@@ -18,12 +19,13 @@ import java.util.UUID;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getUser(@PathVariable("id") @Valid String id) {
-        var foundUser = userRepository.findById(UUID.fromString(id));
-        return foundUser.map(user -> ResponseEntity.ok(user.convertTo()))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        var user = userService.getUser(id);
+
+        return ResponseEntity.ok(user.convertTo());
     }
 
     @PutMapping("/{id}")

@@ -4,15 +4,20 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.mjpancheri.financialcontrol.application.exception.GenerateTokenException;
+import com.mjpancheri.financialcontrol.application.exception.UnauthorizedException;
+import com.mjpancheri.financialcontrol.application.service.AuthorizationService;
 import com.mjpancheri.financialcontrol.domain.user.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.naming.AuthenticationException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
-
+@Slf4j
 @Service
 public class TokenService {
 
@@ -40,7 +45,8 @@ public class TokenService {
                     .withExpiresAt(now.plusMillis(timeout))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
-            throw new RuntimeException("Error while generating token", exception);
+            log.error("Generate token error!", exception);
+            throw new GenerateTokenException("error.generate.token.message");
         }
     }
 
@@ -56,7 +62,8 @@ public class TokenService {
                     .verify(token)
                     .getSubject();
         } catch (JWTVerificationException exception) {
-            return "";
+            log.error("Token invalido: " + token, exception);
+            throw new UnauthorizedException();
         }
     }
 
@@ -71,7 +78,8 @@ public class TokenService {
                     .withExpiresAt(now.plusMillis(resetTimeout))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
-            throw new RuntimeException("Error while generating reset token", exception);
+            log.error("Generate reset token error!", exception);
+            throw new GenerateTokenException("error.generate.reset.token.message");
         }
     }
 
@@ -87,7 +95,8 @@ public class TokenService {
                     .verify(token)
                     .getSubject();
         } catch (JWTVerificationException exception) {
-            return "";
+            log.error("Reset token invalido: " + token, exception);
+            throw new UnauthorizedException();
         }
     }
 }
