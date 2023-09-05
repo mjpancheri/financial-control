@@ -6,17 +6,14 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.mjpancheri.financialcontrol.application.exception.GenerateTokenException;
 import com.mjpancheri.financialcontrol.application.exception.UnauthorizedException;
-import com.mjpancheri.financialcontrol.application.service.AuthorizationService;
 import com.mjpancheri.financialcontrol.domain.user.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.naming.AuthenticationException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Date;
 @Slf4j
 @Service
 public class TokenService {
@@ -98,5 +95,12 @@ public class TokenService {
             log.error("Reset token invalido: " + token, exception);
             throw new UnauthorizedException();
         }
+    }
+
+    public String extractToken(String authorizationHeader) {
+        if (authorizationHeader == null) {
+            return null;
+        }
+        return authorizationHeader.replace("Bearer ", "");
     }
 }

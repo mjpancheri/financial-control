@@ -3,7 +3,6 @@ package com.mjpancheri.financialcontrol.infrastructure.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.auditing.config.AuditingConfiguration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -29,8 +28,8 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/auth/*").permitAll()
-                        .requestMatchers("/users/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "api/v1/auth/*").permitAll()
+                        .requestMatchers("api/v1/users/*").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

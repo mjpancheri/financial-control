@@ -29,7 +29,7 @@ public class UserService {
     private final EmailService emailService;
 
     public User getUserByAuthorizationToken(String authorizationToken) {
-        String token = authorizationToken.replace("Bearer ", "");
+        String token = tokenService.extractToken(authorizationToken);
         String email = tokenService.validateToken(token);
 
         return (User) userRepository.findByEmail(email);
@@ -88,7 +88,6 @@ public class UserService {
             log.error("Error updateUser with: " + id + " | " + data);
             throw new ResourceNotFoundException();
         }
-
         User user = foundUser.get();
         user.setName(data.name());
         user.setEmail(data.email());
