@@ -6,6 +6,7 @@ import com.mjpancheri.financialcontrol.domain.user.dto.UpdateUserDTO;
 import com.mjpancheri.financialcontrol.domain.user.dto.UserResponseDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,36 +19,36 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("users")
+@RequestMapping("api/v1/users")
 public class UserController {
 
-    private final UserService userService;
+    private final UserService service;
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getUser(@PathVariable("id") @Valid String id) {
-        var user = userService.getUser(id);
+        var user = service.getUser(id);
 
         return ResponseEntity.ok(user.convertTo());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable("id") @Valid String id,
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable("id") @UUID String id,
                                                       @RequestBody @Valid UpdateUserDTO body) {
-        User user = userService.updateUser(id, body);
+        User user = service.updateUser(id, body);
 
         return ResponseEntity.ok(user.convertTo());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable("id") @Valid String id) {
-        userService.deleteUser(id);
+        service.deleteUser(id);
 
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/restore")
     public ResponseEntity<UserResponseDTO>restoreUser(@PathVariable("id") @Valid String id) {
-        User user = userService.restoreUser(id);
+        User user = service.restoreUser(id);
 
         return ResponseEntity.ok(user.convertTo());
     }
