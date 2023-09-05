@@ -13,6 +13,7 @@ import com.mjpancheri.financialcontrol.domain.user.dto.UserResponseDTO;
 import com.mjpancheri.financialcontrol.infrastructure.security.TokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,8 +29,11 @@ import java.net.URISyntaxException;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("auth")
+@RequestMapping("api/v1/auth")
 public class AuthenticationController {
+
+    @Value("${api.host}")
+    private String host;
 
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
@@ -49,7 +53,7 @@ public class AuthenticationController {
     public ResponseEntity<UserResponseDTO> register(@RequestBody @Valid RegisterDTO body) throws URISyntaxException {
         User newUser = userService.createUser(body);
 
-        return ResponseEntity.created(new URI("http://localhost:8080/users/"+newUser.getId())).body(newUser.convertTo());
+        return ResponseEntity.created(new URI(host + "/api/v1/users/" + newUser.getId())).body(newUser.convertTo());
     }
 
     @GetMapping("me")
