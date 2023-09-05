@@ -16,4 +16,10 @@ public class FinancialControlException extends RuntimeException {
         this.args = new Object[0];
         this.status = HttpStatus.BAD_REQUEST;
     }
+
+    public FinancialControlException(String code, HttpStatus status) {
+        this.code = code;
+        this.args = new Object[0];
+        this.status = status;
+    }
 }
